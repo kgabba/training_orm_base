@@ -11,17 +11,7 @@ router_basic = APIRouter(prefix='/do')
 mapped_dict = {'users' : UsersTable,
                'teams' : TeamsTable}
 
-@router_basic.get('/{table_name}')
-def get_data_from_table(table_name: str):
-    from main import api
 
-    class_table = mapped_dict.get(table_name)
-    if not class_table:
-        raise HTTPException(status_code=404, detail=f'table {table_name} not found in db')
-    with Session(api.state.eng) as session:
-       result = session.query(class_table).all()
-       return result
-    
 @router_basic.get('/all_tables')
 def get_tables_name():
     return list(Base.metadata.tables.keys())
@@ -48,3 +38,15 @@ def add_team_db(team: Team):
         session.add(new_team)
         session.commit()
     return new_team
+
+@router_basic.get('/{table_name}')
+def get_data_from_table(table_name: str):
+    from main import api
+
+    class_table = mapped_dict.get(table_name)
+    if not class_table:
+        raise HTTPException(status_code=404, detail=f'table {table_name} not found in db')
+    with Session(api.state.eng) as session:
+       result = session.query(class_table).all()
+       return result
+
